@@ -1,10 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import 'package:provider/provider.dart';
-
-import '../../providers/worker_booking_provider.dart';
+import '../../services/socket_service.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
@@ -14,38 +10,35 @@ class WorkerHomeScreen extends StatefulWidget {
 }
 
 class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
-  bool isOnline = false;
+  final SocketService socketService = SocketService();
 
-  Timer? timer;
+  List<Map<String, dynamic>> bookings = [];
+
+  bool isOnline = false;
 
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadBookings();
+    listenBookings();
+  }
 
-      timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-        loadBookings();
-      });
+  void listenBookings() {
+    socketService.bookingStream.listen((data) {
+      if (data["type"] == "new_booking") {
+        setState(() {
+          bookings.insert(0, data);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("New Booking: ${data["service_type"]}")),
+        );
+      }
     });
-  }
-
-  void loadBookings() {
-    Provider.of<WorkerBookingProvider>(context, listen: false).loadBookings();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<WorkerBookingProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF6FE7DD),
@@ -113,15 +106,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             const SizedBox(height: 20),
 
             Expanded(
-              child: provider.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : provider.bookings.isEmpty
-                  ? const Center(child: Text("No Booking Requests"))
+              child: bookings.isEmpty
+                  ? const Center(child: Text("No Live Bookings"))
                   : ListView.builder(
-                      itemCount: provider.bookings.length,
+                      itemCount: bookings.length,
 
                       itemBuilder: (context, index) {
-                        final booking = provider.bookings[index];
+                        final booking = bookings[index];
 
                         return Card(
                           margin: const EdgeInsets.only(bottom: 20),
@@ -134,7 +125,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
                               children: [
                                 Text(
-                                  booking.serviceType,
+                                  booking["service_type"],
 
                                   style: const TextStyle(
                                     fontSize: 20,
@@ -145,7 +136,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
                                 const SizedBox(height: 10),
 
-                                Text("Status: ${booking.status}"),
+                                Text("Status: ${booking["status"]}"),
 
                                 const SizedBox(height: 20),
 
@@ -157,11 +148,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                           backgroundColor: Colors.green,
                                         ),
 
-                                        onPressed: () async {
-                                          await provider.acceptBooking(
-                                            booking.id,
-                                          );
-                                        },
+                                        onPressed: () {},
 
                                         child: const Text("Accept"),
                                       ),
@@ -175,11 +162,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                           backgroundColor: Colors.red,
                                         ),
 
-                                        onPressed: () async {
-                                          await provider.rejectBooking(
-                                            booking.id,
-                                          );
-                                        },
+                                        onPressed: () {},
 
                                         child: const Text("Reject"),
                                       ),
