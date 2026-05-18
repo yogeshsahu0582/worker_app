@@ -8,11 +8,15 @@ class BookingService {
   final ApiService apiService = ApiService();
 
   Future<List<BookingModel>> getPendingBookings() async {
-    Response response = await apiService.dio.get("/bookings/pending");
+    try {
+      Response response = await apiService.dio.get("/bookings/pending");
 
-    return (response.data as List)
-        .map((booking) => BookingModel.fromJson(booking))
-        .toList();
+      return (response.data as List)
+          .map((booking) => BookingModel.fromJson(booking))
+          .toList();
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<bool> acceptBooking(int bookingId) async {

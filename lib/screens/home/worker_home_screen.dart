@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../services/socket_service.dart';
 
+import '../../services/booking_service.dart';
+
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
 
@@ -11,6 +13,8 @@ class WorkerHomeScreen extends StatefulWidget {
 
 class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   final SocketService socketService = SocketService();
+
+  final BookingService bookingService = BookingService();
 
   List<Map<String, dynamic>> bookings = [];
 
@@ -35,6 +39,34 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         );
       }
     });
+  }
+
+  Future<void> acceptBooking(int bookingId) async {
+    bool success = await bookingService.acceptBooking(bookingId);
+
+    if (success) {
+      setState(() {
+        bookings.removeWhere((booking) => booking["booking_id"] == bookingId);
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Booking Accepted")));
+    }
+  }
+
+  Future<void> rejectBooking(int bookingId) async {
+    bool success = await bookingService.rejectBooking(bookingId);
+
+    if (success) {
+      setState(() {
+        bookings.removeWhere((booking) => booking["booking_id"] == bookingId);
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Booking Rejected")));
+    }
   }
 
   @override
@@ -148,7 +180,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                           backgroundColor: Colors.green,
                                         ),
 
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          acceptBooking(booking["booking_id"]);
+                                        },
 
                                         child: const Text("Accept"),
                                       ),
@@ -162,7 +196,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                           backgroundColor: Colors.red,
                                         ),
 
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          rejectBooking(booking["booking_id"]);
+                                        },
 
                                         child: const Text("Reject"),
                                       ),
