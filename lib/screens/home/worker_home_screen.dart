@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../services/socket_service.dart';
 
 import '../../services/booking_service.dart';
+
+import '../../services/location_service.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
@@ -16,15 +20,29 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   final BookingService bookingService = BookingService();
 
+  final LocationService locationService = LocationService();
+
   List<Map<String, dynamic>> bookings = [];
 
   bool isOnline = false;
+
+  Timer? locationTimer;
 
   @override
   void initState() {
     super.initState();
 
     listenBookings();
+  }
+
+  void startLiveLocation() {
+    locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await locationService.updateLocation(1);
+    });
+  }
+
+  void stopLiveLocation() {
+    locationTimer?.cancel();
   }
 
   void listenBookings() {
@@ -67,6 +85,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text("Booking Rejected")));
     }
+  }
+
+  @override
+  void dispose() {
+    stopLiveLocation();
+
+    super.dispose();
   }
 
   @override
@@ -125,10 +150,16 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                   Switch(
                     value: isOnline,
 
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       setState(() {
                         isOnline = value;
                       });
+
+                      if (isOnline) {
+                        startLiveLocation();
+                      } else {
+                        stopLiveLocation();
+                      }
                     },
                   ),
                 ],
