@@ -1,37 +1,23 @@
-import 'package:dio/dio.dart';
-
-import 'package:geolocator/geolocator.dart';
-
-import 'api_service.dart';
+import 'package:http/http.dart' as http;
 
 class LocationService {
-  final ApiService apiService = ApiService();
+  static Future<void> updateLocation({
+    required int bookingId,
 
-  Future<void> updateLocation(int workerId) async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    required String workerName,
 
-    if (!serviceEnabled) {
-      return;
-    }
+    required double latitude,
 
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    Position position = await Geolocator.getCurrentPosition();
-
-    await apiService.dio.post(
-      "/locations/update",
-
-      data: {
-        "worker_id": workerId,
-
-        "latitude": position.latitude,
-
-        "longitude": position.longitude,
-      },
+    required double longitude,
+  }) async {
+    await http.post(
+      Uri.parse(
+        "http://127.0.0.1:8000/location/update"
+        "?booking_id=$bookingId"
+        "&worker_name=$workerName"
+        "&latitude=$latitude"
+        "&longitude=$longitude",
+      ),
     );
   }
 }

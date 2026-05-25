@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 
+import '../../services/location_service.dart';
+
 import '../../services/worker_booking_service.dart';
 
 class LiveBookingsScreen extends StatefulWidget {
@@ -21,6 +23,10 @@ class _LiveBookingsScreenState extends State<LiveBookingsScreen> {
   bool isOnline = true;
 
   Timer? timer;
+
+  double workerLat = 21.9015;
+
+  double workerLng = 77.9040;
 
   @override
   void initState() {
@@ -57,11 +63,21 @@ class _LiveBookingsScreenState extends State<LiveBookingsScreen> {
     );
 
     if (success) {
-      loadBookings();
+      await LocationService.updateLocation(
+        bookingId: bookingId,
+
+        workerName: "Rohit Worker",
+
+        latitude: workerLat,
+
+        longitude: workerLng,
+      );
 
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Booking Accepted")));
+
+      loadBookings();
     }
   }
 
