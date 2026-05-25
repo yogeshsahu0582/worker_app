@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -18,14 +20,24 @@ class _LiveBookingsScreenState extends State<LiveBookingsScreen> {
 
   bool isOnline = true;
 
+  Timer? timer;
+
   @override
   void initState() {
     super.initState();
 
     loadBookings();
+
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      loadBookings();
+    });
   }
 
   Future<void> loadBookings() async {
+    if (!isOnline) {
+      return;
+    }
+
     final response = await http.get(
       Uri.parse("http://127.0.0.1:8000/booking/pending"),
     );
@@ -66,6 +78,13 @@ class _LiveBookingsScreenState extends State<LiveBookingsScreen> {
   }
 
   @override
+  void dispose() {
+    timer?.cancel();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -83,6 +102,8 @@ class _LiveBookingsScreenState extends State<LiveBookingsScreen> {
                   setState(() {
                     isOnline = value;
                   });
+
+                  loadBookings();
                 },
               ),
             ],
