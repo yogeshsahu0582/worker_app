@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "361248790374",
+    "project_id": "pa-system-b6b8b",
+    "storage_bucket": "pa-system-b6b8b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361248790374:android:b0c1a97969a157686a5aa7",
+        "android_client_info": {
+          "package_name": "com.pa.worker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5TF0SgO4UIZA9LBncfBVcCvfrDq1t4S4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

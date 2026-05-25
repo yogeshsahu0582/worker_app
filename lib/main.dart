@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:provider/provider.dart';
+import 'screens/splash/splash_screen.dart';
 
-import 'providers/worker_auth_provider.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-import 'providers/worker_booking_provider.dart';
-
-import 'screens/auth/worker_login_screen.dart';
-
-void main() {
   runApp(const MyApp());
 }
 
@@ -17,22 +13,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => WorkerAuthProvider()),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
 
-        ChangeNotifierProvider(create: (_) => WorkerBookingProvider()),
-      ],
+      title: 'PA Worker',
 
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
 
-        title: "PA Worker",
+        scaffoldBackgroundColor: Colors.white,
 
-        theme: ThemeData(primaryColor: const Color(0xFF6FE7DD)),
-
-        home: const WorkerLoginScreen(),
+        fontFamily: 'Poppins',
       ),
+
+      home: const SplashScreen(),
     );
   }
 }
