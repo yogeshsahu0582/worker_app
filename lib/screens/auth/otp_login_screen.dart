@@ -1,162 +1,124 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
 
 import '../home/home_screen.dart';
 
 class OTPLoginScreen extends StatefulWidget {
-  const OTPLoginScreen({super.key});
+  const OTPLoginScreen({
+    super.key,
+  });
 
   @override
   State<OTPLoginScreen> createState() => _OTPLoginScreenState();
 }
 
 class _OTPLoginScreenState extends State<OTPLoginScreen> {
-  final phoneController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
-  final otpController = TextEditingController();
+  bool isLoading = false;
 
-  String verificationId = "";
+  Future<void> login() async {
+    if (phoneController.text.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Enter valid mobile number",
+          ),
+        ),
+      );
 
-  bool otpSent = false;
+      return;
+    }
 
-  bool loading = false;
-
-  Future<void> sendOTP() async {
     setState(() {
-      loading = true;
+      isLoading = true;
     });
 
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: "+91${phoneController.text}",
-
-      verificationCompleted: (credential) async {
-        await FirebaseAuth.instance.signInWithCredential(credential);
-      },
-
-      verificationFailed: (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message ?? "")));
-      },
-
-      codeSent: (id, token) {
-        verificationId = id;
-
-        setState(() {
-          otpSent = true;
-
-          loading = false;
-        });
-      },
-
-      codeAutoRetrievalTimeout: (id) {},
+    await Future.delayed(
+      const Duration(seconds: 2),
     );
-  }
-
-  Future<void> verifyOTP() async {
-    setState(() {
-      loading = true;
-    });
-
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-
-      smsCode: otpController.text,
-    );
-
-    await FirebaseAuth.instance.signInWithCredential(credential);
 
     if (!mounted) return;
 
+    setState(() {
+      isLoading = false;
+    });
+
     Navigator.pushReplacement(
       context,
-
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-
-            const Text(
-              "PA Worker Login",
-
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 40),
-
-            TextField(
-              controller: phoneController,
-
-              keyboardType: TextInputType.phone,
-
-              decoration: InputDecoration(
-                hintText: "Enter mobile number",
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(25),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 60),
+              const Text(
+                "PA Worker Login",
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-
-            const SizedBox(height: 20),
-
-            if (otpSent)
+              const SizedBox(height: 10),
+              const Text(
+                "Login to continue working",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 60),
               TextField(
-                controller: otpController,
-
-                keyboardType: TextInputType.number,
-
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: "Enter OTP",
-
+                  hintText: "Enter Mobile Number",
+                  prefixIcon: const Icon(
+                    Icons.phone,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-
-              height: 55,
-
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-
-                onPressed: loading
-                    ? null
-                    : otpSent
-                    ? verifyOTP
-                    : sendOTP,
-
-                child: loading
-                    ? const CircularProgressIndicator()
-                    : Text(
-                        otpSent ? "Verify OTP" : "Send OTP",
-
-                        style: const TextStyle(
+              const SizedBox(height: 35),
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                  ),
+                  onPressed: isLoading ? null : login,
+                  child: isLoading
+                      ? const CircularProgressIndicator(
                           color: Colors.black,
-
-                          fontSize: 18,
+                        )
+                      : const Text(
+                          "Login",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
