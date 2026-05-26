@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/live_booking_model.dart';
-
-import '../../widgets/live_booking_popup.dart';
+import '../jobs/active_job_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -15,53 +13,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isOnline = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    Future.delayed(
-      const Duration(seconds: 4),
-      () {
-        showBookingPopup();
-      },
-    );
-  }
-
-  void showBookingPopup() {
-    final booking = LiveBookingModel(
-      id: "1",
-      userName: "Rahul Sharma",
-      service: "Personal Assistant",
-      pickup: "Vijay Nagar, Indore",
-      amount: 450,
-      distance: 2.5,
-    );
-
-    showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      builder: (_) {
-        return LiveBookingPopup(
-          booking: booking,
-          onAccept: () {
-            Navigator.pop(context);
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  "Booking Accepted",
-                ),
-              ),
-            );
-          },
-          onReject: () {
-            Navigator.pop(context);
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 10),
             const Text(
-              "₹0.00",
+              "₹465",
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
@@ -113,30 +64,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.amber.shade100,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total Jobs",
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "0",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    "Active Job",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Icon(
-                    Icons.work,
-                    size: 60,
+                  SizedBox(height: 15),
+                  Text(
+                    "Hospital Assistant",
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Vijay Nagar, Indore",
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ActiveJobScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Open Active Job",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
               ),
             ),
           ],
