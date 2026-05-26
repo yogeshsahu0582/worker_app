@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../chat/chat_screen.dart';
+
 import '../jobs/active_job_screen.dart';
+
+import '../wallet/withdraw_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -58,34 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.amber.shade100,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Active Job",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  Text(
-                    "Hospital Assistant",
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Vijay Nagar, Indore",
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               height: 55,
@@ -105,6 +81,56 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Open Active Job",
                   style: TextStyle(
                     color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const WithdrawScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Withdraw Money",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ChatScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Open Chat",
+                  style: TextStyle(
+                    color: Colors.black,
                     fontSize: 18,
                   ),
                 ),
